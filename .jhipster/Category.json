@@ -1,0 +1,31 @@
+{
+  "changelogDate": "20221129070148",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Category",
+  "pagination": "no",
+  "relationships": [
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "category",
+      "ownerSide": true,
+      "relationshipName": "user",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "contact",
+      "otherEntityRelationshipName": "category",
+      "ownerSide": true,
+      "relationshipName": "contact",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "no"
+}
