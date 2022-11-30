@@ -17,6 +17,8 @@ export type IQueryParams = {
   page?: number;
   size?: number;
   sort?: string;
+  categoryId?: string;
+  searchTerm?: string;
 };
 
 /**

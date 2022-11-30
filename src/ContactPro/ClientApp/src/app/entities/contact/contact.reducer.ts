@@ -30,8 +30,9 @@ const apiUrl = "api/contacts";
 
 export const getEntities = createAsyncThunk(
   "contact/fetch_entity_list",
-  async ({ page, size, sort }: IQueryParams) => {
-    const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  async ({ categoryId, searchTerm }: IQueryParams) => {
+    const searchTermEncoded = encodeURIComponent(searchTerm);
+    const requestUrl = `${apiUrl}?categoryId=${categoryId}&searchTerm=${searchTermEncoded}&cacheBuster=${new Date().getTime()}`;
     return axios.get<IContact[]>(requestUrl);
   }
 );

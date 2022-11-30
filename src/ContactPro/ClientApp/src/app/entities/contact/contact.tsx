@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
-import { Button, Table } from "reactstrap";
-import { openFile, byteSize, Translate, TextFormat } from "react-jhipster";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from "app/config/constants";
 import { useAppDispatch, useAppSelector } from "app/config/store";
-
 import { IContact } from "app/shared/model/contact.model";
 import { getEntities } from "./contact.reducer";
+import { ICategory } from 'app/shared/model/category.model';
+import { getEntities as getCategories } from 'app/entities/category/category.reducer';
 
 export const Contact = (props: RouteComponentProps<{ url: string }>) => {
   const dispatch = useAppDispatch();
@@ -16,174 +13,155 @@ export const Contact = (props: RouteComponentProps<{ url: string }>) => {
   const contactList = useAppSelector((state) => state.contact.entities);
   const loading = useAppSelector((state) => state.contact.loading);
 
+  const categories = useAppSelector(state => state.category.entities);
+  const [categoryId, setCategoryId] = useState('0');
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     dispatch(getEntities({}));
+    dispatch(getCategories({}));
   }, []);
 
-  const handleSyncList = () => {
-    dispatch(getEntities({}));
+  const getAllEntities = () => {
+    dispatch(
+      getEntities({
+        categoryId,
+        searchTerm
+      })
+    );
   };
 
-  const { match } = props;
+  useEffect(() => {
+    getAllEntities();
+  }, [categoryId]);
 
   return (
-    <div>
-      <h2 id="contact-heading" data-cy="ContactHeading">
-        Contacts
-        <div className="d-flex justify-content-end">
-          <Button
-            className="me-2"
-            color="info"
-            onClick={handleSyncList}
-            disabled={loading}
-          >
-            <FontAwesomeIcon icon="sync" spin={loading} /> Refresh List
-          </Button>
-          <Link
-            to="/contact/new"
-            className="btn btn-primary jh-create-entity"
-            id="jh-create-entity"
-            data-cy="entityCreateButton"
-          >
+    <>
+      <div className="row">
+        <div className="col-12 text-end mb-3">
+          <Link to="/contact/new" className="btn btn-primary rounded-pill" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
-            &nbsp; Create new Contact
+            &nbsp; Create New
           </Link>
         </div>
-      </h2>
-      <div className="table-responsive">
-        {contactList && contactList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Address 1</th>
-                <th>Address 2</th>
-                <th>City</th>
-                <th>State</th>
-                <th>Zip Code</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Birth Date</th>
-                <th>Image Data</th>
-                <th>Image Type</th>
-                <th>Created</th>
-                <th>User</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {contactList.map((contact, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button
-                      tag={Link}
-                      to={`/contact/${contact.id}`}
-                      color="link"
-                      size="sm"
-                    >
-                      {contact.id}
-                    </Button>
-                  </td>
-                  <td>{contact.firstName}</td>
-                  <td>{contact.lastName}</td>
-                  <td>{contact.address1}</td>
-                  <td>{contact.address2}</td>
-                  <td>{contact.city}</td>
-                  <td>{contact.state}</td>
-                  <td>{contact.zipCode}</td>
-                  <td>{contact.email}</td>
-                  <td>{contact.phoneNumber}</td>
-                  <td>
-                    {contact.birthDate ? (
-                      <TextFormat
-                        type="date"
-                        value={contact.birthDate}
-                        format={APP_LOCAL_DATE_FORMAT}
-                      />
-                    ) : null}
-                  </td>
-                  <td>
-                    {contact.imageData ? (
-                      <div>
-                        {contact.imageDataContentType ? (
-                          <a
-                            onClick={openFile(
-                              contact.imageDataContentType,
-                              contact.imageData
-                            )}
-                          >
-                            <img
-                              src={`data:${contact.imageDataContentType};base64,${contact.imageData}`}
-                              style={{ maxHeight: "30px" }}
-                            />
-                            &nbsp;
-                          </a>
-                        ) : null}
-                        <span>
-                          {contact.imageDataContentType},{" "}
-                          {byteSize(contact.imageData)}
-                        </span>
-                      </div>
-                    ) : null}
-                  </td>
-                  <td>{contact.imageType}</td>
-                  <td>
-                    {contact.created ? (
-                      <TextFormat
-                        type="date"
-                        value={contact.created}
-                        format={APP_LOCAL_DATE_FORMAT}
-                      />
-                    ) : null}
-                  </td>
-                  <td>{contact.user ? contact.user.login : ""}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button
-                        tag={Link}
-                        to={`/contact/${contact.id}`}
-                        color="info"
-                        size="sm"
-                        data-cy="entityDetailsButton"
-                      >
-                        <FontAwesomeIcon icon="eye" />{" "}
-                        <span className="d-none d-md-inline">View</span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/contact/${contact.id}/edit`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" />{" "}
-                        <span className="d-none d-md-inline">Edit</span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/contact/${contact.id}/delete`}
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" />{" "}
-                        <span className="d-none d-md-inline">Delete</span>
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          !loading && (
-            <div className="alert alert-warning">No Contacts found</div>
-          )
-        )}
       </div>
-    </div>
+      <div className="row g-3">
+        <div className="col-12 col-md-4 sideNav px-3 py-4">
+          <form>
+            <div className="input-group">
+              <input
+                className="form-control"
+                type="search"
+                name="searchString"
+                placeholder="Search Term"
+                value={searchTerm}
+                onChange={e => {
+                  setSearchTerm(e.target.value);
+                }}
+              />
+              <input
+                type="submit"
+                className="btn btn-outline-primary"
+                value="Search"
+                onClick={e => {
+                  e.preventDefault();
+                  getAllEntities();
+                }}
+              />
+            </div>
+          </form>
+          <form>
+            <div className="contact-mt">
+              <label className="form-label fw-bold">CATEGORY FILTER</label>
+              <select
+                name="categoryId"
+                className="form-control"
+                value={categoryId}
+                onChange={e => {
+                  setSearchTerm('');
+                  setCategoryId(e.target.value);
+                }}
+              >
+                <option value="0">All Contacts</option>
+                {categories.map((c: ICategory) => {
+                  return c.contacts != null && c.contacts.length > 0 ? (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ) : null;
+                })}
+              </select>
+            </div>
+          </form>
+        </div>
+        <div className="col-12 col-md-8">
+          <div className="row row-cols-1 g-3">
+            {contactList != null && contactList.length > 0
+              ? [...contactList]
+                  .sort(function (a: IContact, b: IContact) {
+                    if (a.lastName.toLowerCase() < b.lastName.toLowerCase()) return -1;
+                    else if (a.lastName.toLowerCase() > b.lastName.toLowerCase()) return 1;
+                    else {
+                      if (a.firstName.toLowerCase() < b.firstName.toLowerCase()) return -1;
+                      else if (a.firstName.toLowerCase() > b.firstName.toLowerCase()) return 1;
+                    }
+                    return 0;
+                  })
+                  .map((contact: IContact, i: number) => (
+                    <div key={i} className="col">
+                      <div className="card mb-3">
+                        <div className="row g-0">
+                          <div className="col-md-4 square-img-container">
+                            <img
+                              src={
+                                contact.imageType && contact.imageData
+                                  ? `data:${contact.imageType};base64,${contact.imageData}`
+                                  : '/content/img/DefaultContactImage.png'
+                              }
+                              className="square-img rounded-start"
+                              alt={`${contact.firstName} ${contact.lastName}`}
+                            />
+                          </div>
+                          <div className="col-md-8">
+                            <div className="card-body">
+                              <h5 className="card-title">{`${contact.firstName} ${contact.lastName}`}</h5>
+                              <div className="card-text">
+                                {contact.address1}
+                                <br />
+                                {contact.address2 ? contact.address2 : null}
+                                {contact.address2 ? <br /> : null}
+                                {contact.city}, {contact.state} {contact.zipCode}
+                              </div>
+                              <div className="card-text">
+                                <span className="fw-bold me-2">Phone:</span>
+                                {contact.phoneNumber}
+                              </div>
+                              <div className="card-text">
+                                <span className="fw-bold me-2">Email:</span>
+                                {contact.email}
+                              </div>
+                              <div className="fs-4 d-flex gap-1 contact-mt">
+                                <Link className="me-3 editIcons" to={`${contact.id}/edit`}>
+                                  <i className="bi bi-pencil-fill "></i>
+                                </Link>
+                                <Link className="me-3 editIcons" to={`/email-contact/${contact.id}`}>
+                                  <i className="bi bi-envelope-fill "></i>
+                                </Link>
+                                <Link className="me-3 editIcons" to={`${contact.id}/delete`}>
+                                  <i className="bi bi-trash-fill text-danger "></i>
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+              : !loading && <h4 className="ps-3 pt-2 text-body">No contacts found</h4>}
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

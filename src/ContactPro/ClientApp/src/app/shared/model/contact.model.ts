@@ -15,7 +15,6 @@ export interface IContact {
   email?: string;
   phoneNumber?: string;
   birthDate?: string | null;
-  imageDataContentType?: string | null;
   imageData?: string | null;
   imageType?: string | null;
   created?: string | null;
