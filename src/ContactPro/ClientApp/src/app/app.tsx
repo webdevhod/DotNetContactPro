@@ -1,9 +1,9 @@
 import "react-toastify/dist/ReactToastify.css";
 import "./app.scss";
+import "./contactpro.scss";
 import "app/config/dayjs.ts";
 
 import React, { useEffect } from "react";
-import { Card } from "reactstrap";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -48,33 +48,28 @@ export const App = () => {
     (state) => state.applicationProfile.isOpenAPIEnabled
   );
 
-  const paddingTop = "60px";
   return (
     <Router basename={baseHref}>
-      <div className="app-container" style={{ paddingTop }}>
-        <ToastContainer
-          position={toast.POSITION.TOP_LEFT}
-          className="toastify-container"
-          toastClassName="toastify-toast"
+      <ToastContainer
+        position={toast.POSITION.TOP_LEFT}
+        className="toastify-container"
+        toastClassName="toastify-toast"
+      />
+      <ErrorBoundary>
+        <Header
+          isAuthenticated={isAuthenticated}
+          isAdmin={isAdmin}
+          ribbonEnv={ribbonEnv}
+          isInProduction={isInProduction}
+          isOpenAPIEnabled={isOpenAPIEnabled}
         />
+      </ErrorBoundary>
+      <main className="content" id="mainHero">
         <ErrorBoundary>
-          <Header
-            isAuthenticated={isAuthenticated}
-            isAdmin={isAdmin}
-            ribbonEnv={ribbonEnv}
-            isInProduction={isInProduction}
-            isOpenAPIEnabled={isOpenAPIEnabled}
-          />
+          <AppRoutes />
         </ErrorBoundary>
-        <div className="container-fluid view-container" id="app-view-container">
-          <Card className="jh-card">
-            <ErrorBoundary>
-              <AppRoutes />
-            </ErrorBoundary>
-          </Card>
-          <Footer />
-        </div>
-      </div>
+      </main>
+      <Footer />
     </Router>
   );
 };

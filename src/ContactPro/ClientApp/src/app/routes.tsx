@@ -1,5 +1,5 @@
-import React from "react";
-import { Switch } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Switch, useLocation } from "react-router-dom";
 import Loadable from "react-loadable";
 
 import Login from "app/modules/login/login";
@@ -31,8 +31,14 @@ const Admin = Loadable({
 });
 
 const Routes = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
-    <div className="view-routes">
+    <section className={`${pathname === '/' ? 'container-fluid' : 'container'} h-100`} id="app-view-container">
       <Switch>
         <ErrorBoundaryRoute path="/login" component={Login} />
         <ErrorBoundaryRoute path="/logout" component={Logout} />
@@ -57,17 +63,17 @@ const Routes = () => {
         <PrivateRoute
           path="/account"
           component={Account}
-          hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}
+          hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER, AUTHORITIES.GUEST]}
         />
         <ErrorBoundaryRoute path="/" exact component={Home} />
         <PrivateRoute
           path="/"
           component={EntitiesRoutes}
-          hasAnyAuthorities={[AUTHORITIES.USER]}
+          hasAnyAuthorities={[AUTHORITIES.USER, AUTHORITIES.GUEST]}
         />
         <ErrorBoundaryRoute component={PageNotFound} />
       </Switch>
-    </div>
+    </section>
   );
 };
 
