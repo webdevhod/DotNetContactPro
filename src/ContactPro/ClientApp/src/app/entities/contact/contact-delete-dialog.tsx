@@ -5,7 +5,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useAppDispatch, useAppSelector } from "app/config/store";
-import { getEntity, deleteEntity } from "./contact.reducer";
+import { getEntity, deleteEntity, reset } from "./contact.reducer";
 
 export const ContactDeleteDialog = (
   props: RouteComponentProps<{ id: string }>
@@ -29,6 +29,7 @@ export const ContactDeleteDialog = (
     if (updateSuccess && loadModal) {
       handleClose();
       setLoadModal(false);
+      dispatch(reset());
     }
   }, [updateSuccess]);
 

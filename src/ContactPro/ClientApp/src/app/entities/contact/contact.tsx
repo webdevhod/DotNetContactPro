@@ -17,6 +17,8 @@ export const Contact = (props: RouteComponentProps<{ url: string }>) => {
   const [categoryId, setCategoryId] = useState('0');
   const [searchTerm, setSearchTerm] = useState("");
 
+  const { match } = props;
+
   useEffect(() => {
     dispatch(getEntities({}));
     dispatch(getCategories({}));
@@ -141,13 +143,13 @@ export const Contact = (props: RouteComponentProps<{ url: string }>) => {
                                 {contact.email}
                               </div>
                               <div className="fs-4 d-flex gap-1 contact-mt">
-                                <Link className="me-3 editIcons" to={`${contact.id}/edit`}>
+                                <Link className="me-3 editIcons" to={`${match.url}/${contact.id}/edit`}>
                                   <i className="bi bi-pencil-fill "></i>
                                 </Link>
                                 <Link className="me-3 editIcons" to={`/email-contact/${contact.id}`}>
                                   <i className="bi bi-envelope-fill "></i>
                                 </Link>
-                                <Link className="me-3 editIcons" to={`${contact.id}/delete`}>
+                                <Link className="me-3 editIcons" to={`${match.url}/${contact.id}/delete`}>
                                   <i className="bi bi-trash-fill text-danger "></i>
                                 </Link>
                               </div>
