@@ -11,7 +11,6 @@ import {
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppDispatch, useAppSelector } from "app/config/store";
-import { ICategory } from "app/shared/model/category.model";
 import { getEntities as getCategories } from "app/entities/category/category.reducer";
 import { States } from "app/shared/model/enumerations/states.model";
 import {
@@ -107,9 +106,7 @@ export const ContactUpdate = (props: RouteComponentProps<{ id: string }>) => {
     setImageData(contactEntity.imageData || []);
     setImageBase64(contactEntity.imageData || '');
     setImageType(contactEntity.imageType || '');
-    setCategoriesSelected(
-      contactEntity.categories != null ? contactEntity.categories.map((c: ICategory) => ({ id: c.id, name: c.name })) : []
-    );
+    setCategoriesSelected(contactEntity.categories || []);
   }, [contactEntity]);
 
   useEffect(() => {
@@ -339,7 +336,7 @@ export const ContactUpdate = (props: RouteComponentProps<{ id: string }>) => {
                       isSearchable={true}
                       getOptionValue={option => option.id}
                       getOptionLabel={option => option.name}
-                      options={categories.map((c: ICategory) => ({ id: c.id, name: c.name }))}
+                      options={categories}
                       isClearable={true}
                       closeMenuOnSelect={false}
                       openMenuOnFocus={true}

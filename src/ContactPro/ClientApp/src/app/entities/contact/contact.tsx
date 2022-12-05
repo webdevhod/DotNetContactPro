@@ -3,9 +3,9 @@ import { Link, RouteComponentProps } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppDispatch, useAppSelector } from "app/config/store";
 import { IContact } from "app/shared/model/contact.model";
-import { getEntities } from "./contact.reducer";
+import { getEntities, reset as resetContacts } from "./contact.reducer";
 import { ICategory } from 'app/shared/model/category.model';
-import { getEntities as getCategories } from 'app/entities/category/category.reducer';
+import { getEntities as getCategories, reset as resetCategories } from 'app/entities/category/category.reducer';
 
 export const Contact = (props: RouteComponentProps<{ url: string }>) => {
   const dispatch = useAppDispatch();
@@ -16,6 +16,8 @@ export const Contact = (props: RouteComponentProps<{ url: string }>) => {
   const categories = useAppSelector(state => state.category.entities);
   const [categoryId, setCategoryId] = useState('0');
   const [searchTerm, setSearchTerm] = useState("");
+  const contactErrorMessage = useAppSelector(state => state.contact.errorMessage);
+  const categoryErrorMessage = useAppSelector(state => state.category.errorMessage);
 
   const { match } = props;
 
@@ -36,6 +38,12 @@ export const Contact = (props: RouteComponentProps<{ url: string }>) => {
   useEffect(() => {
     getAllEntities();
   }, [categoryId]);
+
+  useEffect(() => {
+    dispatch(resetContacts());
+    dispatch(resetCategories());
+    getAllEntities();
+  }, [contactErrorMessage, categoryErrorMessage]);
 
   return (
     <>

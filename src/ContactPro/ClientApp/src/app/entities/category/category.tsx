@@ -1,30 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import { Button, Table } from "reactstrap";
-import { Translate } from "react-jhipster";
+import { TextFormat, getSortState } from 'react-jhipster';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from "app/config/constants";
+import { APP_DATE_FORMAT } from "app/config/constants";
 import { useAppDispatch, useAppSelector } from "app/config/store";
 
-import { ICategory } from "app/shared/model/category.model";
-import { getEntities } from "./category.reducer";
+import { getEntities, reset } from "./category.reducer";
 
 export const Category = (props: RouteComponentProps<{ url: string }>) => {
   const dispatch = useAppDispatch();
 
   const categoryList = useAppSelector((state) => state.category.entities);
   const loading = useAppSelector((state) => state.category.loading);
+  const categoryErrorMessage = useAppSelector(state => state.category.errorMessage);
 
   useEffect(() => {
-    dispatch(getEntities({}));
+    handleSyncList();
   }, []);
 
   const handleSyncList = () => {
     dispatch(getEntities({}));
   };
 
-  const { match } = props;
+  useEffect(() => {
+    dispatch(reset());
+    handleSyncList();
+  }, [categoryErrorMessage]);
 
   return (
     <div>
@@ -37,7 +41,7 @@ export const Category = (props: RouteComponentProps<{ url: string }>) => {
             onClick={handleSyncList}
             disabled={loading}
           >
-            <FontAwesomeIcon icon="sync" spin={loading} /> Refresh List
+            <FontAwesomeIcon icon="sync" spin={loading} />&nbsp; Refresh List
           </Button>
           <Link
             to="/category/new"
@@ -52,72 +56,39 @@ export const Category = (props: RouteComponentProps<{ url: string }>) => {
       </h2>
       <div className="table-responsive">
         {categoryList && categoryList.length > 0 ? (
-          <Table responsive>
+            <Table responsive striped bordered hover>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>User</th>
-                <th>Contact</th>
-                <th />
+                <th className="hand col-7 align-middle">
+                  Name <FontAwesomeIcon icon="sort" className="ms-2" />
+                </th>
+                <th className="hand align-middle">
+                  Created <FontAwesomeIcon icon="sort" className="ms-2" />
+                </th>
+                <th className="align-middle">&nbsp;</th>
               </tr>
             </thead>
             <tbody>
               {categoryList.map((category, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button
-                      tag={Link}
-                      to={`/category/${category.id}`}
-                      color="link"
-                      size="sm"
-                    >
-                      {category.id}
-                    </Button>
+                  <td className="align-middle">
+                    <Link to={`/category/${category.id}`} style={{ fontWeight: 'normal', textDecoration: 'none' }}>
+                      {category.name}
+                    </Link>
                   </td>
-                  <td>{category.name}</td>
-                  <td>{category.user ? category.user.login : ""}</td>
-                  <td>
-                    {category.contacts
-                      ? category.contacts.map((val, j) => (
-                          <span key={j}>
-                            <Link to={`/contact/${val.id}`}>{val.id}</Link>
-                            {j === category.contacts.length - 1 ? "" : ", "}
-                          </span>
-                        ))
-                      : null}
+                  <td className="align-middle">
+                    {category.created ? <TextFormat type="date" value={category.created} format={APP_DATE_FORMAT} /> : null}
                   </td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button
-                        tag={Link}
-                        to={`/category/${category.id}`}
-                        color="info"
-                        size="sm"
-                        data-cy="entityDetailsButton"
-                      >
-                        <FontAwesomeIcon icon="eye" />{" "}
-                        <span className="d-none d-md-inline">View</span>
+                  <td className="text-end align-middle">
+                    <div className="btn-group flex-btn-group-container gap-2">
+                      <Button tag={Link} to={`/category/${category.id}/edit`} color="primary" size="sm" data-cy="entityEditButton">
+                        <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
                       </Button>
-                      <Button
-                        tag={Link}
-                        to={`/category/${category.id}/edit`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" />{" "}
-                        <span className="d-none d-md-inline">Edit</span>
+                      <Button tag={Link} to={`/email-category/${category.id}`} color="info" size="sm" data-cy="entityEmailButton">
+                        <FontAwesomeIcon icon={faEnvelope} /> <span className="d-none d-md-inline">Email</span>
                       </Button>
-                      <Button
-                        tag={Link}
-                        to={`/category/${category.id}/delete`}
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" />{" "}
-                        <span className="d-none d-md-inline">Delete</span>
+                      <Button tag={Link} to={`/category/${category.id}/delete`} color="danger" size="sm" data-cy="entityDeleteButton">
+                        <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
                       </Button>
                     </div>
                   </td>

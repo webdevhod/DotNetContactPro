@@ -6,14 +6,15 @@ using Newtonsoft.Json;
 
 namespace ContactPro.Domain.Entities
 {
-    [Table("category")]
+    [Table("Category")]
     public class Category : BaseEntity<long>
     {
         [Required]
         public string Name { get; set; }
-        public long? UserId { get; set; }
+        public string UserId { get; set; }
+        public DateTime? Created { get; set; }
         public User User { get; set; }
-        public IList<Contact> Contacts { get; set; } = new List<Contact>();
+        public virtual ICollection<Contact> Contacts { get; set; } = new HashSet<Contact>();
 
         // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
 
@@ -36,6 +37,7 @@ namespace ContactPro.Domain.Entities
             return "Category{" +
                     $"ID='{Id}'" +
                     $", Name='{Name}'" +
+                    $", Created='{Created}'" +
                     "}";
         }
     }

@@ -20,6 +20,7 @@ namespace ContactPro.Infrastructure.Data.Repositories
         public override async Task<Contact> CreateOrUpdateAsync(Contact contact)
         {
             List<Type> entitiesToBeUpdated = new List<Type>();
+            entitiesToBeUpdated.Add(typeof(Category));
             return await base.CreateOrUpdateAsync(contact, entitiesToBeUpdated);
         }
     }

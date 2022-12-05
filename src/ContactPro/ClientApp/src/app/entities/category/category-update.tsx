@@ -1,28 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
-import { Button, Row, Col, FormText } from "reactstrap";
-import { isNumber, ValidatedField, ValidatedForm } from "react-jhipster";
+import { Button, Row, Col, Label } from "reactstrap";
+import { ValidatedField, ValidatedForm } from "react-jhipster";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import {
-  convertDateTimeFromServer,
-  convertDateTimeToServer,
-  displayDefaultDateTime,
-} from "app/shared/util/date-utils";
-import { mapIdList } from "app/shared/util/entity-utils";
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import Select from 'react-select';
 import { useAppDispatch, useAppSelector } from "app/config/store";
 
-import { IUser } from "app/shared/model/user.model";
 import { getUsers } from "app/modules/administration/user-management/user-management.reducer";
-import { IContact } from "app/shared/model/contact.model";
 import { getEntities as getContacts } from "app/entities/contact/contact.reducer";
-import { ICategory } from "app/shared/model/category.model";
 import {
   getEntity,
   updateEntity,
   createEntity,
   reset,
 } from "./category.reducer";
+
 
 export const CategoryUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const dispatch = useAppDispatch();
@@ -35,6 +28,9 @@ export const CategoryUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const loading = useAppSelector((state) => state.category.loading);
   const updating = useAppSelector((state) => state.category.updating);
   const updateSuccess = useAppSelector((state) => state.category.updateSuccess);
+  const [contactsSelected, setContactsSelected] = useState([]);
+  const errorMessage = useAppSelector(state => state.category.errorMessage);
+
   const handleClose = () => {
     props.history.push("/category");
   };
@@ -51,17 +47,30 @@ export const CategoryUpdate = (props: RouteComponentProps<{ id: string }>) => {
   }, []);
 
   useEffect(() => {
+    if (categoryEntity != null && categoryEntity.contacts != null) {
+      setContactsSelected([...categoryEntity.contacts]);
+    }
+  }, [categoryEntity]);
+
+  useEffect(() => {
     if (updateSuccess) {
       handleClose();
     }
   }, [updateSuccess]);
 
+  useEffect(() => {
+    if (errorMessage != null) {
+      dispatch(reset());
+      props.history.push("/404");
+    }
+  }, [errorMessage]);
+
   const saveEntity = (values) => {
     const entity = {
       ...categoryEntity,
       ...values,
-      contacts: mapIdList(values.contacts),
-      user: users.find((it) => it.id.toString() === values.user.toString()),
+      contacts: contactsSelected,
+      user: users.find((it) => it.id?.toString() === values.user?.toString()),
     };
 
     if (isNew) {
@@ -88,7 +97,7 @@ export const CategoryUpdate = (props: RouteComponentProps<{ id: string }>) => {
             id="contactProApp.category.home.createOrEditLabel"
             data-cy="CategoryCreateUpdateHeading"
           >
-            Create or edit a Category
+            {`${isNew ? 'Create' : 'Edit'} Category`}
           </h2>
         </Col>
       </Row>
@@ -106,13 +115,14 @@ export const CategoryUpdate = (props: RouteComponentProps<{ id: string }>) => {
                   name="id"
                   required
                   readOnly
+                  hidden
                   id="category-id"
                   label="ID"
                   validate={{ required: true }}
                 />
               ) : null}
               <ValidatedField
-                label="Name"
+                label="Category Name"
                 id="category-name"
                 name="name"
                 data-cy="name"
@@ -121,61 +131,43 @@ export const CategoryUpdate = (props: RouteComponentProps<{ id: string }>) => {
                   required: { value: true, message: "This field is required." },
                 }}
               />
-              <ValidatedField
-                id="category-user"
-                name="user"
-                data-cy="user"
-                label="User"
-                type="select"
-              >
-                <option value="" key="0" />
-                {users
-                  ? users.map((otherEntity) => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.login}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <ValidatedField
-                label="Contact"
+              <Label htmlFor="contacts">Contacts</Label>
+              <Select
+                className="col-12 col-lg-6 mb-3"
                 id="category-contact"
                 data-cy="contact"
-                type="select"
-                multiple
                 name="contacts"
-              >
-                <option value="" key="0" />
-                {contacts
-                  ? contacts.map((otherEntity) => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <Button
-                tag={Link}
-                id="cancel-save"
-                data-cy="entityCreateCancelButton"
-                to="/category"
-                replace
-                color="info"
-              >
+                isMulti={true}
+                isSearchable={true}
+                getOptionValue={option => option.id}
+                getOptionLabel={option => `${option.firstName} ${option.lastName}`}
+                options={contacts}
+                isClearable={true}
+                closeMenuOnSelect={false}
+                openMenuOnFocus={true}
+                value={contactsSelected}
+                backspaceRemovesValue={true}
+                onChange={e => {
+                  setContactsSelected([...e]);
+                }}
+              />
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/category" replace color="secondary">
                 <FontAwesomeIcon icon="arrow-left" />
-                &nbsp;
-                <span className="d-none d-md-inline">Back</span>
+                <span className="d-inline">&nbsp;Back</span>
               </Button>
+              {isNew ? null : 
+                <>
+                  &nbsp;
+                  <Button tag={Link} to={`/email-category/${props.match.params.id}`} data-cy="entityCreateEmailButton" replace className="ms-1" color="info">
+                    <FontAwesomeIcon icon={faEnvelope} />
+                  <span className="d-inline">&nbsp;Email</span>
+                  </Button>
+                </>
+              }
               &nbsp;
-              <Button
-                color="primary"
-                id="save-entity"
-                data-cy="entityCreateSaveButton"
-                type="submit"
-                disabled={updating}
-              >
+              <Button id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating} className="ms-1" color="primary">
                 <FontAwesomeIcon icon="save" />
-                &nbsp; Save
+                <span className="d-inline">&nbsp;Save</span>
               </Button>
             </ValidatedForm>
           )}

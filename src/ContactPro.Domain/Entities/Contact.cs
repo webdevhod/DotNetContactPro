@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace ContactPro.Domain.Entities
 {
-    [Table("contact")]
+    [Table("Contact")]
     public class Contact : BaseEntity<long>
     {
         [Required]
@@ -33,10 +33,9 @@ namespace ContactPro.Domain.Entities
         public byte[] ImageData { get; set; }
         public string ImageType { get; set; }
         public DateTime? Created { get; set; }
-        public long? UserId { get; set; }
+        public string UserId { get; set; }
         public User User { get; set; }
-        [JsonIgnore]
-        public IList<Category> Categories { get; set; } = new List<Category>();
+        public virtual ICollection<Category> Categories { get; set; } = new HashSet<Category>();
 
         // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
 
