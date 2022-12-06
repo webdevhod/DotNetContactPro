@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using JHipsterNet.Core.Pagination;
 using ContactPro.Domain.Entities;
 using ContactPro.Domain.Services;
@@ -14,6 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace ContactPro.Controllers
 {
@@ -89,13 +93,37 @@ namespace ContactPro.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Contact>>> GetAllContacts(IPageable pageable)
+        public async Task<ActionResult<IEnumerable<Contact>>> GetAllContacts(IPageable pageable, [FromQuery(Name = "searchTerm")] string searchTerm = "", [FromQuery(Name = "categoryId")] string categoryId = "0")
         {
             _log.LogDebug("REST request to get a page of Contacts");
 
-            var result = await _contactRepository.QueryHelper()
-                .Filter(c => c.UserId != null && _utilityService.GetCurrentUserId().Equals(c.UserId))
-                .GetPageAsync(pageable);
+            IPage<Contact> result = null;
+            
+            if (!string.IsNullOrEmpty(searchTerm) && !searchTerm.Equals("undefined"))
+            {
+                searchTerm = Regex.Replace(HttpUtility.UrlDecode(searchTerm, System.Text.Encoding.UTF8).ToLower(), @"\s+", " ");
+                result = await _contactRepository.QueryHelper()
+                    .Filter(c => c.UserId != null && _utilityService.GetCurrentUserId().Equals(c.UserId) && ((c.FirstName + " " + c.LastName).ToLower().Contains(searchTerm) || (c.LastName + " " + c.FirstName).ToLower().Contains(searchTerm)))
+                    .GetPageAsync(pageable);
+            }
+            else if (Int64.TryParse(categoryId, out long id))
+            {
+                if (id > 0)
+                {
+                    result = await _contactRepository.QueryHelper()
+                    .Filter(c => c.UserId != null && _utilityService.GetCurrentUserId().Equals(c.UserId) && c.Categories.Any(category => category.Id == id))
+                    .GetPageAsync(pageable);
+                }
+            }
+
+            if (result is null)
+            {
+                Console.WriteLine("result is null");
+                result = await _contactRepository.QueryHelper()
+                    .Filter(c => c.UserId != null && _utilityService.GetCurrentUserId().Equals(c.UserId))
+                    .GetPageAsync(pageable);
+            }
+          
             return Ok(result.Content).WithHeaders(result.GeneratePaginationHttpHeaders());
         }
 

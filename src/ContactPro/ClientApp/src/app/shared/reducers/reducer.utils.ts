@@ -19,6 +19,7 @@ export type IQueryParams = {
   sort?: string;
   categoryId?: string;
   searchTerm?: string;
+  eagerLoad?: boolean;
 };
 
 /**

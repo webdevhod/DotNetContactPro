@@ -23,7 +23,7 @@ export const Contact = (props: RouteComponentProps<{ url: string }>) => {
 
   useEffect(() => {
     dispatch(getEntities({}));
-    dispatch(getCategories({}));
+    dispatch(getCategories({eagerLoad: true}));
   }, []);
 
   const getAllEntities = () => {
@@ -42,6 +42,7 @@ export const Contact = (props: RouteComponentProps<{ url: string }>) => {
   useEffect(() => {
     dispatch(resetContacts());
     dispatch(resetCategories());
+    dispatch(getCategories({eagerLoad: true}));
     getAllEntities();
   }, [contactErrorMessage, categoryErrorMessage]);
 

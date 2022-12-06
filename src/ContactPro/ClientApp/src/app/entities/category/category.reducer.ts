@@ -30,8 +30,8 @@ const apiUrl = "api/categories";
 
 export const getEntities = createAsyncThunk(
   "category/fetch_entity_list",
-  async ({ page, size, sort }: IQueryParams) => {
-    const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  async ({ eagerLoad }: IQueryParams) => {
+    const requestUrl = `${apiUrl}?${eagerLoad ? "eagerLoad=true&" : ""}cacheBuster=${new Date().getTime()}`;
     return axios.get<ICategory[]>(requestUrl);
   }
 );

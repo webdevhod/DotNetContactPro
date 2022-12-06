@@ -81,12 +81,25 @@ namespace ContactPro.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(IPageable pageable)
+        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories(IPageable pageable, [FromQuery] bool eagerLoad = false)
         {
             _log.LogDebug("REST request to get a page of Categories");
-            var result = await _categoryRepository.QueryHelper()
-                .Filter(c => c.UserId != null && _utilityService.GetCurrentUserId().Equals(c.UserId))                
-                .GetPageAsync(pageable);
+            IPage<Category> result = null;
+            
+            if (eagerLoad)
+            {
+                result = await _categoryRepository.QueryHelper()
+                    .Include(c => c.Contacts)
+                    .Filter(c => c.UserId != null && _utilityService.GetCurrentUserId().Equals(c.UserId))                
+                    .GetPageAsync(pageable);
+            }
+            else
+            {
+                result = await _categoryRepository.QueryHelper()
+                    .Filter(c => c.UserId != null && _utilityService.GetCurrentUserId().Equals(c.UserId))                
+                    .GetPageAsync(pageable);
+            }
+            
             return Ok(result.Content).WithHeaders(result.GeneratePaginationHttpHeaders());
         }
 
