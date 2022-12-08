@@ -7,6 +7,7 @@ import Contact from "./contact";
 import ContactDetail from "./contact-detail";
 import ContactUpdate from "./contact-update";
 import ContactDeleteDialog from "./contact-delete-dialog";
+import EmailPage from "../email-data/email-page";
 
 const Routes = ({ match }) => (
   <>
@@ -25,6 +26,11 @@ const Routes = ({ match }) => (
         exact
         path={`${match.url}/:id`}
         component={ContactDetail}
+      />
+      <ErrorBoundaryRoute
+        exact
+        path={`${match.url}/:id/email`}
+        component={EmailPage}
       />
       <ErrorBoundaryRoute path={match.url} component={Contact} />
     </Switch>

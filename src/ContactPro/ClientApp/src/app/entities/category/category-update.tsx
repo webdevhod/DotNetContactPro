@@ -140,7 +140,7 @@ export const CategoryUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 isMulti={true}
                 isSearchable={true}
                 getOptionValue={option => option.id}
-                getOptionLabel={option => `${option.firstName} ${option.lastName}`}
+                getOptionLabel={option => `${option.firstName} ${option.lastName} <${option.email}>`}
                 options={contacts}
                 isClearable={true}
                 closeMenuOnSelect={false}
@@ -158,7 +158,7 @@ export const CategoryUpdate = (props: RouteComponentProps<{ id: string }>) => {
               {isNew ? null : 
                 <>
                   &nbsp;
-                  <Button tag={Link} to={`/email-category/${props.match.params.id}`} data-cy="entityCreateEmailButton" replace className="ms-1" color="info">
+                  <Button tag={Link} to={`/category/${props.match.params.id}/email`} data-cy="entityCreateEmailButton" replace className="ms-1" color="info">
                     <FontAwesomeIcon icon={faEnvelope} />
                   <span className="d-inline">&nbsp;Email</span>
                   </Button>

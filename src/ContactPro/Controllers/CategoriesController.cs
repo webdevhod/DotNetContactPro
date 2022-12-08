@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ContactPro.Controllers
@@ -27,20 +28,26 @@ namespace ContactPro.Controllers
         private const string EntityName = "category";
         private readonly ILogger<CategoriesController> _log;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IContactRepository _contactRepository;
         private readonly ApplicationDatabaseContext _context;
         private UtilityService _utilityService;
+        private EmailService _emailService;
 
 
         public CategoriesController(ILogger<CategoriesController> log,
         ICategoryRepository categoryRepository,
+        IContactRepository contactRepository,
         ApplicationDatabaseContext context,
-        UserManager<User> userManager,
-        IHttpContextAccessor httpContextAccessor)
+        UtilityService utilityService,
+        EmailService emailService
+        )
         {
             _log = log;
             _categoryRepository = categoryRepository;
+            _contactRepository = contactRepository;
             _context = context;
-            _utilityService = new UtilityService(userManager, httpContextAccessor);
+            _utilityService = utilityService;
+            _emailService = emailService;
         }
 
         [HttpPost]
@@ -58,7 +65,7 @@ namespace ContactPro.Controllers
             await _categoryRepository.CreateOrUpdateAsync(category);
             await _categoryRepository.SaveChangesAsync();
             return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category)
-                .WithHeaders(HeaderUtil.CreateEntityCreationAlert(EntityName, category.Id.ToString()));
+                .WithHeaders(HeaderUtil.CreateEntityCreationAlert(category.Name, EntityName, category.Id.ToString()));
         }
 
         [HttpPut("{id}")]
@@ -74,10 +81,13 @@ namespace ContactPro.Controllers
             
             await CheckAllContacts(category);
 
+            oldCategory.Contacts = new HashSet<Contact>();
+            await _categoryRepository.CreateOrUpdateAsync(oldCategory);
+            await _categoryRepository.SaveChangesAsync();
             await _categoryRepository.CreateOrUpdateAsync(category);
             await _categoryRepository.SaveChangesAsync();
             return Ok(category)
-                .WithHeaders(HeaderUtil.CreateEntityUpdateAlert(EntityName, category.Id.ToString()));
+                .WithHeaders(HeaderUtil.CreateEntityUpdateAlert(category.Name, EntityName, category.Id.ToString()));
         }
 
         [HttpGet]
@@ -113,6 +123,42 @@ namespace ContactPro.Controllers
             return ActionResultUtil.WrapOrNotFound(result);
         }
 
+        [HttpGet("{id}/email")]
+        public async Task<IActionResult> GetEmailCategory([FromRoute] long id)
+        {
+            _log.LogDebug($"REST request to get Email Category : {id}");
+            var result = await _categoryRepository.QueryHelper()
+                .Include(category => category.Contacts)
+                .GetOneAsync(category => category.Id == id && _utilityService.GetCurrentUserId().Equals(category.UserId));
+            if (result == null) throw new BadRequestAlertException("Invalid Id", EntityName, "idnull");
+            EmailData emailData = new EmailData();
+            emailData.Id = id;
+            emailData.IsCategory = true;
+            foreach(Contact contact in result.Contacts)
+            {
+                emailData.Contacts.Add(contact);
+            }
+            return ActionResultUtil.WrapOrNotFound(emailData);
+        }
+
+        [HttpPut("{id}/email")]
+        public async Task<IActionResult> SendEmailContact([FromBody] EmailData emailData)
+        {
+            _log.LogDebug($"REST request to post Email Category : {emailData.Id}");
+            ICollection<Contact> contacts = new HashSet<Contact>();
+            foreach(Contact contact in emailData.Contacts)
+            {
+                var result = await _contactRepository.QueryHelper()
+                    .GetOneAsync(c => c.Id == contact.Id && _utilityService.GetCurrentUserId().Equals(c.UserId));
+                if (result == null) throw new BadRequestAlertException("Invalid Id", EntityName, "idnull");
+                contacts.Add(result);
+            }
+            
+            _emailService.SendEmailAsync(contacts, emailData.Subject, emailData.Body);
+
+            return NoContent().WithHeaders(HeaderUtil.CreateEntityEmailAlert(string.Join(", ", emailData.Contacts.Select(c => c.Email).ToList()), EntityName, emailData.Id.ToString()));
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory([FromRoute] long id)
         {
@@ -124,7 +170,7 @@ namespace ContactPro.Controllers
 
             await _categoryRepository.DeleteByIdAsync(id);
             await _categoryRepository.SaveChangesAsync();
-            return NoContent().WithHeaders(HeaderUtil.CreateEntityDeletionAlert(EntityName, id.ToString()));
+            return NoContent().WithHeaders(HeaderUtil.CreateEntityDeletionAlert(category.Name, EntityName, id.ToString()));
         }
 
         private async Task CheckAllContacts(Category category)

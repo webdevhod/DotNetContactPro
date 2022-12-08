@@ -20,6 +20,8 @@ export type IQueryParams = {
   categoryId?: string;
   searchTerm?: string;
   eagerLoad?: boolean;
+  isCategory?: boolean;
+  id?: string | number;
 };
 
 /**

@@ -17,6 +17,8 @@ export const Category = (props: RouteComponentProps<{ url: string }>) => {
   const loading = useAppSelector((state) => state.category.loading);
   const categoryErrorMessage = useAppSelector(state => state.category.errorMessage);
 
+  const { match } = props;
+
   useEffect(() => {
     handleSyncList();
   }, []);
@@ -81,13 +83,13 @@ export const Category = (props: RouteComponentProps<{ url: string }>) => {
                   </td>
                   <td className="text-end align-middle">
                     <div className="btn-group flex-btn-group-container gap-2">
-                      <Button tag={Link} to={`/category/${category.id}/edit`} color="primary" size="sm" data-cy="entityEditButton">
+                      <Button tag={Link} to={`${match.url}/${category.id}/edit`} color="primary" size="sm" data-cy="entityEditButton">
                         <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
                       </Button>
-                      <Button tag={Link} to={`/email-category/${category.id}`} color="info" size="sm" data-cy="entityEmailButton">
+                      <Button tag={Link} to={`${match.url}/${category.id}/email`} color="info" size="sm" data-cy="entityEmailButton">
                         <FontAwesomeIcon icon={faEnvelope} /> <span className="d-none d-md-inline">Email</span>
                       </Button>
-                      <Button tag={Link} to={`/category/${category.id}/delete`} color="danger" size="sm" data-cy="entityDeleteButton">
+                      <Button tag={Link} to={`${match.url}/${category.id}/delete`} color="danger" size="sm" data-cy="entityDeleteButton">
                         <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
                       </Button>
                     </div>

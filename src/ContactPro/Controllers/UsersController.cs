@@ -60,7 +60,7 @@ public class UsersController : ControllerBase
         var newUser = await _userService.CreateUser(_mapper.Map<User>(userDto));
         await _mailService.SendCreationEmail(newUser);
         return CreatedAtAction(nameof(GetUser), new { login = newUser.Login }, newUser)
-            .WithHeaders(HeaderUtil.CreateEntityCreationAlert("userManagement.created", newUser.Login));
+            .WithHeaders(HeaderUtil.CreateEntityCreationAlert(newUser.Login, "user created", newUser.Login));
     }
 
     [HttpPut]
@@ -75,7 +75,7 @@ public class UsersController : ControllerBase
         var updatedUser = await _userService.UpdateUser(_mapper.Map<User>(userDto));
 
         return ActionResultUtil.WrapOrNotFound(updatedUser)
-            .WithHeaders(HeaderUtil.CreateAlert("userManagement.updated", userDto.Login));
+            .WithHeaders(HeaderUtil.CreateAlert("user updated", userDto.Login));
     }
 
     [HttpPut("{id}")]
@@ -117,6 +117,6 @@ public class UsersController : ControllerBase
     {
         _log.LogDebug($"REST request to delete User : {login}");
         await _userService.DeleteUser(login);
-        return NoContent().WithHeaders(HeaderUtil.CreateEntityDeletionAlert("userManagement.deleted", login));
+        return NoContent().WithHeaders(HeaderUtil.CreateEntityDeletionAlert(login, "user deleted", login));
     }
 }

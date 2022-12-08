@@ -155,7 +155,7 @@ export const Contact = (props: RouteComponentProps<{ url: string }>) => {
                                 <Link className="me-3 editIcons" to={`${match.url}/${contact.id}/edit`}>
                                   <i className="bi bi-pencil-fill "></i>
                                 </Link>
-                                <Link className="me-3 editIcons" to={`/email-contact/${contact.id}`}>
+                                <Link className="me-3 editIcons" to={`${match.url}/${contact.id}/email`}>
                                   <i className="bi bi-envelope-fill "></i>
                                 </Link>
                                 <Link className="me-3 editIcons" to={`${match.url}/${contact.id}/delete`}>

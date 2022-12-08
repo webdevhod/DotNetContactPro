@@ -11,18 +11,26 @@ namespace ContactPro.Domain.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly ClaimsPrincipal User;
+        private readonly User currentUser;
         private readonly string UserId;
 
         public UtilityService(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             User = httpContextAccessor.HttpContext.User;
-            UserId = _userManager.Users.Where(user => user.Login == GetCurrentUserName()).SingleOrDefault().Id;
+            currentUser = _userManager.Users.Where(user => user.Login == GetCurrentUserName()).SingleOrDefault();
+            Console.WriteLine("currentUser");
+            Console.WriteLine(currentUser);
+        }
+
+        public string GetCurrentUserEmail()
+        {
+            return currentUser.Email;
         }
 
         public string GetCurrentUserId()
         {
-            return UserId;
+            return currentUser.Id;
         }
 
         public string GetCurrentUserName()

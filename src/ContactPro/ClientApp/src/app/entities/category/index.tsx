@@ -7,6 +7,7 @@ import Category from "./category";
 import CategoryDetail from "./category-detail";
 import CategoryUpdate from "./category-update";
 import CategoryDeleteDialog from "./category-delete-dialog";
+import EmailPage from "../email-data/email-page";
 
 const Routes = ({ match }) => (
   <>
@@ -25,6 +26,11 @@ const Routes = ({ match }) => (
         exact
         path={`${match.url}/:id`}
         component={CategoryDetail}
+      />
+      <ErrorBoundaryRoute
+        exact
+        path={`${match.url}/:id/email`}
+        component={EmailPage}
       />
       <ErrorBoundaryRoute path={match.url} component={Category} />
     </Switch>

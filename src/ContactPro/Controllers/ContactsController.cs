@@ -32,18 +32,19 @@ namespace ContactPro.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly UserManager<User> _userManager;
         private UtilityService _utilityService;
-
+        private EmailService _emailService;
 
         public ContactsController(ILogger<ContactsController> log,
         IContactRepository contactRepository,
         ICategoryRepository categoryRepository,
-        UserManager<User> userManager,
-        IHttpContextAccessor httpContextAccessor)
+        UtilityService utilityService,
+        EmailService emailService)
         {
             _log = log;
             _contactRepository = contactRepository;
             _categoryRepository = categoryRepository;
-            _utilityService = new UtilityService(userManager, httpContextAccessor);
+            _utilityService = utilityService;
+            _emailService = emailService;
         }
 
         [HttpPost]
@@ -68,7 +69,7 @@ namespace ContactPro.Controllers
             await _contactRepository.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetContact), new { id = contact.Id }, contact)
-                .WithHeaders(HeaderUtil.CreateEntityCreationAlert(EntityName, contact.Id.ToString()));
+                .WithHeaders(HeaderUtil.CreateEntityCreationAlert(contact.FullName, EntityName, contact.Id.ToString()));
         }
 
         [HttpPut("{id}")]
@@ -89,7 +90,7 @@ namespace ContactPro.Controllers
             await _contactRepository.SaveChangesAsync();           
             
             return Ok(contact)
-                .WithHeaders(HeaderUtil.CreateEntityUpdateAlert(EntityName, contact.Id.ToString()));
+                .WithHeaders(HeaderUtil.CreateEntityUpdateAlert(contact.FullName, EntityName, contact.Id.ToString()));
         }
 
         [HttpGet]
@@ -137,6 +138,39 @@ namespace ContactPro.Controllers
             return ActionResultUtil.WrapOrNotFound(result);
         }
 
+        [HttpGet("{id}/email")]
+        public async Task<IActionResult> GetEmailContact([FromRoute] long id)
+        {
+            _log.LogDebug($"REST request to get Email Contact : {id}");
+            var result = await _contactRepository.QueryHelper()
+                .Include(contact => contact.Categories)
+                .GetOneAsync(contact => contact.Id == id && _utilityService.GetCurrentUserId().Equals(contact.UserId));
+            if (result == null) throw new BadRequestAlertException("Invalid Id", EntityName, "idnull");
+            EmailData emailData = new EmailData();
+            emailData.Id = id;
+            emailData.IsCategory = false;
+            emailData.Contacts.Add(result);
+            return ActionResultUtil.WrapOrNotFound(emailData);
+        }
+
+        [HttpPut("{id}/email")]
+        public async Task<IActionResult> SendEmailContact([FromBody] EmailData emailData)
+        {
+            _log.LogDebug($"REST request to post Email Contact : {emailData.Id}");
+            ICollection<Contact> contacts = new HashSet<Contact>();
+            foreach(Contact contact in emailData.Contacts)
+            {
+                var result = await _contactRepository.QueryHelper()
+                    .GetOneAsync(c => c.Id == contact.Id && _utilityService.GetCurrentUserId().Equals(c.UserId));
+                if (result == null) throw new BadRequestAlertException("Invalid Id", EntityName, "idnull");
+                contacts.Add(result);
+            }
+            
+            _emailService.SendEmailAsync(contacts, emailData.Subject, emailData.Body);
+
+            return NoContent().WithHeaders(HeaderUtil.CreateEntityEmailAlert(string.Join(", ", emailData.Contacts.Select(c => c.Email).ToList()), EntityName, emailData.Id.ToString()));
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContact([FromRoute] long id)
         {
@@ -146,7 +180,7 @@ namespace ContactPro.Controllers
             if (contact == null) throw new BadRequestAlertException("Invalid Id", EntityName, "idnull");
             await _contactRepository.DeleteByIdAsync(id);
             await _contactRepository.SaveChangesAsync();
-            return NoContent().WithHeaders(HeaderUtil.CreateEntityDeletionAlert(EntityName, id.ToString()));
+            return NoContent().WithHeaders(HeaderUtil.CreateEntityDeletionAlert(contact.FullName, EntityName, id.ToString()));
         }
 
         private async Task ClearOldCategories(Contact oldContact) {

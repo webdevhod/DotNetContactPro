@@ -29,6 +29,7 @@
     "jhiPrefix": "jhi",
     "jhipsterVersion": "7.8.1",
     "languages": ["en", "fr"],
+    "lastLiquibaseTimestamp": 1670289906000,
     "namespace": "ContactPro",
     "nativeLanguage": "en",
     "otherModules": [

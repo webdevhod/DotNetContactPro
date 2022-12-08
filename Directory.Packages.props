@@ -38,12 +38,12 @@
 	<PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(EntityFrameworkPackageVersion)" />
 	<PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(EntityFrameworkPackageVersion)" />
 	<PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkPackageVersion)" />
-    <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="$(EntityFrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="$(EntityFrameworkPackageVersion)" />
 	<PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkPackageVersion)" />
 	<PackageVersion Include="coverlet.msbuild" Version="3.1.2"/>
 	<PackageVersion Include="FakeItEasy" Version="7.3.1" />
 	<PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspNetCorePackageVersion)" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+	<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
 	<PackageVersion Include="Moq" Version="4.18.2" />
 	<PackageVersion Include="xunit" Version="2.4.2" />
 	<PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5"/>
@@ -51,5 +51,7 @@
 	<PackageVersion Include="FluentAssertions" Version="6.8.0" />
 	<PackageVersion Include="FluentAssertions.AspNetCore.Mvc" Version="4.2.0" />
 	<PackageVersion Include="FluentAssertions.Json" Version="6.1.0" />
+	<PackageVersion Include="MailKit" Version="3.4.3" />
+	<PackageVersion Include="MimeKit" Version="3.4.3" />
   </ItemGroup>
 </Project>
