@@ -1,9 +1,9 @@
 import React from 'react';
-// import { demo } from 'app/shared/reducers/authentication';
+import { demo } from 'app/shared/reducers/authentication';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 export const Home = () => {
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);
 
   return (
@@ -33,7 +33,7 @@ export const Home = () => {
               <button
                 className="btn btn-lg btn-primary rounded-pill demo-button"
                 onClick={() => {
-                  // dispatch(demo());
+                  dispatch(demo());
                 }}
               >
                 DEMO

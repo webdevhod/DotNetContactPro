@@ -154,7 +154,7 @@ namespace ContactPro.Controllers
                 contacts.Add(result);
             }
             
-            _emailService.SendEmailAsync(contacts, emailData.Subject, emailData.Body);
+            await _emailService.SendEmailAsync(contacts, emailData.Subject, emailData.Body);
 
             return NoContent().WithHeaders(HeaderUtil.CreateEntityEmailAlert(string.Join(", ", emailData.Contacts.Select(c => c.Email).ToList()), EntityName, emailData.Id.ToString()));
         }

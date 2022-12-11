@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-// import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { Collapse } from 'reactstrap';
-import { AdminMenu, EntitiesMenu, AccountMenu } from '../menus';
+import { AdminMenu, AccountMenu } from '../menus';
 import { useAppDispatch } from 'app/config/store';
-// import { demo } from 'app/shared/reducers/authentication';
+import { demo } from 'app/shared/reducers/authentication';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -20,7 +19,7 @@ const Header = (props: IHeaderProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const { pathname } = useLocation();
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   // const navigate = useNavigate();
 
   const closeMenu = () => {
@@ -83,17 +82,17 @@ const Header = (props: IHeaderProps) => {
                   </Link>
                 </li>
                 <li className="nav-item me-2">
-                  <button
+                  <Link
+                    to="/"
                     type="button"
                     className="btn btn-outline-primary rounded-pill btnlinks"
                     onClick={() => {
-                      // navigate('/');
-                      // dispatch(demo());
+                      dispatch(demo());
                       closeMenu();
                     }}
                   >
                     Demo
-                  </button>
+                  </Link>
                 </li>
               </>
             ) : (

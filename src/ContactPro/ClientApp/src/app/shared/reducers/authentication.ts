@@ -50,6 +50,10 @@ export const authenticate = createAsyncThunk(
   }
 );
 
+export const mockAuthenticate = createAsyncThunk('authentication/mock', async () => axios.post<any>('api/demo'), {
+  serializeError: serializeAxiosError,
+});
+
 export const login: (
   username: string,
   password: string,
@@ -72,6 +76,18 @@ export const login: (
     }
     dispatch(getSession());
   };
+
+export const demo: () => AppThunk = () => async dispatch => {
+  clearAuthToken();
+  const result = await dispatch(mockAuthenticate());
+  const response = result.payload as AxiosResponse;
+  const bearerToken = response?.headers?.authorization;
+  if (bearerToken && bearerToken.slice(0, 7) === 'Bearer ') {
+    const jwt = bearerToken.slice(7, bearerToken.length);
+    Storage.session.set(AUTH_TOKEN_KEY, jwt);
+  }
+  dispatch(getSession());
+};
 
 export const clearAuthToken = () => {
   if (Storage.local.get(AUTH_TOKEN_KEY)) {
