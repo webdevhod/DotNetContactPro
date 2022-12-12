@@ -14,8 +14,6 @@ using ContactPro.Web.Rest.Utilities;
 using ContactPro.Domain.Repositories.Interfaces;
 using ContactPro.Infrastructure.Web.Rest.Utilities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
@@ -31,7 +29,6 @@ namespace ContactPro.Controllers
         private readonly ILogger<ContactsController> _log;
         private readonly IContactRepository _contactRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly UserManager<User> _userManager;
         private UtilityService _utilityService;
         private EmailService _emailService;
 

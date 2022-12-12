@@ -10,6 +10,7 @@ using ContactPro.Domain.Services.Interfaces;
 using ContactPro.Security.Jwt;
 using ContactPro.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -29,10 +30,10 @@ namespace ContactPro.Controllers
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IAuthenticationService _authenticationService;
         private readonly ITokenProvider _tokenProvider;
-        private UtilityService _utilityService;
+        private readonly UtilityService _utilityService;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IContactRepository _contactRepository;
-        private readonly IHostEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         IList<Address> _addressList;
         IList<Person> _personList;
         IList<string> _dobList;
@@ -48,7 +49,7 @@ namespace ContactPro.Controllers
             UtilityService utilityService,
             ICategoryRepository categoryRepository,
             IContactRepository contactRepository,
-            IHostEnvironment environment
+            IWebHostEnvironment environment
         )
         {
             _log = log;
@@ -74,7 +75,8 @@ namespace ContactPro.Controllers
                 new Address("260 Camel Bend Ct", "Schaumburg", States.IL, "60194", "(847) 798-9253")
             };
 
-            string folderPath = System.IO.Directory.GetCurrentDirectory() + "/Web/Assets/";
+            string folderPath = _environment.WebRootPath + "/content/img/";
+
             _personList = new List<Person>(){
                 new Person("Claudia", "Black", folderPath + "ClaudiaBlack.png"),
                 new Person("Courtenay", "Taylor", folderPath + "CourtenayTaylor.png"),
