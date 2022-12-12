@@ -33,7 +33,7 @@ public static class SecurityStartup
         var opt = services.BuildServiceProvider().GetRequiredService<IOptions<SecuritySettings>>();
         var securitySettings = opt.Value;
         byte[] keyBytes;
-        var secret = Environment.GetEnvironmentVariable("JWT") ?? securitySettings.Authentication.Jwt.Secret;
+        var secret = securitySettings.Authentication.Jwt.Secret;
 
         if (!string.IsNullOrWhiteSpace(secret))
         {
@@ -41,7 +41,10 @@ public static class SecurityStartup
         }
         else
         {
-            keyBytes = Convert.FromBase64String(securitySettings.Authentication.Jwt.Base64Secret);
+            string jwtSecret = Environment.GetEnvironmentVariable("JWT") ?? securitySettings.Authentication.Jwt.Base64Secret;
+            keyBytes = Convert.FromBase64String(jwtSecret);
+            Console.WriteLine("jwt secret");
+            Console.WriteLine(jwtSecret);
         }
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
