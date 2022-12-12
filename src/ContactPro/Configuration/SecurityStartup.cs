@@ -33,7 +33,7 @@ public static class SecurityStartup
         var opt = services.BuildServiceProvider().GetRequiredService<IOptions<SecuritySettings>>();
         var securitySettings = opt.Value;
         byte[] keyBytes;
-        var secret = securitySettings.Authentication.Jwt.Secret;
+        var secret = Environment.GetEnvironmentVariable("JWT") ?? securitySettings.Authentication.Jwt.Secret;
 
         if (!string.IsNullOrWhiteSpace(secret))
         {
