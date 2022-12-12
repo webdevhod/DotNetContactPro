@@ -96,8 +96,9 @@ public class TokenProvider : ITokenProvider
         }
         else
         {
-            _log.LogDebug("Using a Base64-encoded JWT secret key");
-            keyBytes = Convert.FromBase64String(_securitySettings.Authentication.Jwt.Base64Secret);
+            string jwtSecret = Environment.GetEnvironmentVariable("JWT") ?? _securitySettings.Authentication.Jwt.Base64Secret;
+            _log.LogDebug($"Using a Base64-encoded JWT secret key {jwtSecret}");
+            keyBytes = Convert.FromBase64String(jwtSecret);
         }
 
         _key = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature);
