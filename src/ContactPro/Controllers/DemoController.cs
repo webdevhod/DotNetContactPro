@@ -74,7 +74,7 @@ namespace ContactPro.Controllers
                 new Address("260 Camel Bend Ct", "Schaumburg", States.IL, "60194", "(847) 798-9253")
             };
 
-            string folderPath = (_environment.IsProduction() ? "out/" : "") + "ClientApp/src/content/img/";
+            string folderPath = (_environment.IsProduction() ? "out/" : "ClientApp/src/") + "content/img/";
             _personList = new List<Person>(){
                 new Person("Claudia", "Black", folderPath + "ClaudiaBlack.png"),
                 new Person("Courtenay", "Taylor", folderPath + "CourtenayTaylor.png"),
