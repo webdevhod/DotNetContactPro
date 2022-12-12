@@ -49,7 +49,7 @@ public class EmailService
             await smtp.SendAsync(mimeMessage);
             smtp.Disconnect(true);
         }
-        catch (Exception e)
+        catch
         {
             throw;
         }

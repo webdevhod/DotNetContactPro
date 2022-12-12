@@ -12,15 +12,12 @@ namespace ContactPro.Domain.Services
         private readonly UserManager<User> _userManager;
         private readonly ClaimsPrincipal User;
         private readonly User currentUser;
-        private readonly string UserId;
 
         public UtilityService(UserManager<User> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             User = httpContextAccessor.HttpContext.User;
             currentUser = _userManager.Users.Where(user => user.Login == GetCurrentUserName()).SingleOrDefault();
-            Console.WriteLine("currentUser");
-            Console.WriteLine(currentUser);
         }
 
         public string GetCurrentUserEmail()
