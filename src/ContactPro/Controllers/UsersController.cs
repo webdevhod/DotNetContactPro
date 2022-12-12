@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JHipsterNet.Core.Pagination;
 using JHipsterNet.Core.Pagination.Extensions;
 using ContactPro.Domain.Entities;
+using ContactPro.Domain.Repositories.Interfaces;
 using ContactPro.Security;
 using ContactPro.Domain.Services.Interfaces;
 using ContactPro.Dto;
@@ -33,15 +34,19 @@ public class UsersController : ControllerBase
     private readonly IMailService _mailService;
     private readonly UserManager<User> _userManager;
     private readonly IUserService _userService;
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IContactRepository _contactRepository;
 
     public UsersController(ILogger<UsersController> log, UserManager<User> userManager, IUserService userService,
-        IMapper mapper, IMailService mailService)
+        IMapper mapper, IMailService mailService, ICategoryRepository categoryRepository, IContactRepository contactRepository)
     {
         _log = log;
         _userManager = userManager;
         _userService = userService;
         _mailService = mailService;
         _mapper = mapper;
+        _categoryRepository = categoryRepository;
+        _contactRepository = contactRepository;
     }
 
     [HttpPost]
@@ -116,6 +121,22 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> DeleteUser([FromRoute] string login)
     {
         _log.LogDebug($"REST request to delete User : {login}");
+        User user = await _userService.GetByLogin(login);
+        IEnumerable<Category> categories = await _categoryRepository.QueryHelper().Filter(c => c.UserId != null && c.UserId.Equals(user.Id)).GetAllAsync(); 
+        IEnumerable<Contact> contacts = await _contactRepository.QueryHelper().Filter(c => c.UserId != null && c.UserId.Equals(user.Id)).GetAllAsync(); 
+
+        foreach(Category category in categories)
+        {
+            await _categoryRepository.DeleteByIdAsync(category.Id);
+        }
+        await _categoryRepository.SaveChangesAsync();
+
+        foreach(Contact contact in contacts)
+        {
+            await _contactRepository.DeleteByIdAsync(contact.Id);
+        }
+        await _contactRepository.SaveChangesAsync();
+
         await _userService.DeleteUser(login);
         return NoContent().WithHeaders(HeaderUtil.CreateEntityDeletionAlert(login, "user deleted", login));
     }
