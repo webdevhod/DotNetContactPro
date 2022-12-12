@@ -36,9 +36,23 @@ public class EmailService
         mimeMessage.Body = body.ToMessageBody();
 
         using var smtp = new SmtpClient();
-        smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
-        smtp.Authenticate(_mailSettings.Email, _mailSettings.Password);
-        await smtp.SendAsync(mimeMessage);
-        smtp.Disconnect(true);
+
+        try 
+        {
+            string email = _mailSettings.Email ?? Environment.GetEnvironmentVariable("Email"); 
+            string host = _mailSettings.EmailHost ?? Environment.GetEnvironmentVariable("EmailHost");
+            string password = _mailSettings.EmailPassword ?? Environment.GetEnvironmentVariable("EmailPassword");
+            int port = _mailSettings.EmailPort != 0 ? _mailSettings.EmailPort : Int32.Parse(Environment.GetEnvironmentVariable("EmailPort"));
+
+            smtp.Connect(host, port, SecureSocketOptions.StartTls);
+            smtp.Authenticate(email, password);
+            await smtp.SendAsync(mimeMessage);
+            smtp.Disconnect(true);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+
     }
 }
