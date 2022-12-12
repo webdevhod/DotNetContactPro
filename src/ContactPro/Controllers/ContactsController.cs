@@ -6,6 +6,7 @@ using System.Web;
 using JHipsterNet.Core.Pagination;
 using ContactPro.Domain.Entities;
 using ContactPro.Domain.Services;
+using ContactPro.Crosscutting.Constants;
 using ContactPro.Crosscutting.Exceptions;
 using ContactPro.Web.Extensions;
 using ContactPro.Web.Filters;
@@ -154,6 +155,7 @@ namespace ContactPro.Controllers
         }
 
         [HttpPut("{id}/email")]
+        [Authorize(Roles=RolesConstants.ADMIN + "," + RolesConstants.USER)]
         public async Task<IActionResult> SendEmailContact([FromBody] EmailData emailData)
         {
             _log.LogDebug($"REST request to post Email Contact : {emailData.Id}");
@@ -166,7 +168,7 @@ namespace ContactPro.Controllers
                 contacts.Add(result);
             }
             
-            _emailService.SendEmailAsync(contacts, emailData.Subject, emailData.Body);
+            await _emailService.SendEmailAsync(contacts, emailData.Subject, emailData.Body);
 
             return NoContent().WithHeaders(HeaderUtil.CreateEntityEmailAlert(string.Join(", ", emailData.Contacts.Select(c => c.Email).ToList()), EntityName, emailData.Id.ToString()));
         }

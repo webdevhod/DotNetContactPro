@@ -1,18 +1,18 @@
 import React, { MouseEvent, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities } from '../contact/contact.reducer';
-import { getEntity, updateEntity } from './email-data.reducer';
+import { getEntity, updateEntity, reset } from './email-data.reducer';
 import Select from 'react-select';
-// import { hasAnyAuthority } from 'app/shared/auth/private-route';
-// import { AUTHORITIES } from 'app/config/constants';
+import { hasAnyAuthority } from 'app/shared/auth/private-route';
+import { AUTHORITIES } from 'app/config/constants';
+import { toast } from 'react-toastify';
 
 const EmailPage = (props) => {
   const { match } = props; // if contact, use this reducer, else that reducer.
   const dispatch = useAppDispatch();
 
   const updateSuccess = useAppSelector(state => state.emailData.updateSuccess);
-  // const loading = useAppSelector((state) => state.emailData.loading);
-  // const errorMessage = useAppSelector(state => state.emailData.errorMessage);
+  const errorMessage = useAppSelector(state => state.emailData.errorMessage);
   
   const emailDataEntity = useAppSelector((state) => state.emailData.entity);
   const [contactsSelected, setContactsSelected] = useState([]);
@@ -21,8 +21,8 @@ const EmailPage = (props) => {
   const [body, setBody] = useState('');
   const [isCategory, setIsCategory] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
-  // const [loaded, setLoaded] = useState(false);
-  // const isGuest = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.GUEST]));
+  const [loaded, setLoaded] = useState(false);
+  const isGuest = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.GUEST]));
 
   const handleClose = () => {
     props.history.push(isCategory ? "/category" : "/contact");
@@ -36,8 +36,6 @@ const EmailPage = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log("emailDataEntity");
-    console.log(emailDataEntity);
     if (emailDataEntity != null && emailDataEntity.contacts) {
       setContactsSelected([...emailDataEntity.contacts]);
     }
@@ -64,18 +62,18 @@ const EmailPage = (props) => {
     }
   }, [updateSuccess]);
 
-  // useEffect(() => {
-  //   if (loaded && errorMessage != null) {
-  //     dispatch(reset());
-  //     if (isGuest) {
-  //       toast.error('Cannot email from demo account. Please sign up for a free user account.');
-  //     }
-          // props.history.push("/404");
-  //   }
-  //   if (!loaded) {
-  //     setLoaded(true);
-  //   }
-  // }, [errorMessage]);
+  useEffect(() => {
+    if (loaded && errorMessage != null) {
+      dispatch(reset());
+      if (isGuest) {
+        toast.error('Cannot email from demo account. Please sign up for a free user account.');
+      }
+          props.history.push("/404");
+    }
+    if (!loaded) {
+      setLoaded(true);
+    }
+  }, [errorMessage]);
 
   return (
     <>

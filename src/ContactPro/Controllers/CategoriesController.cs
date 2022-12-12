@@ -1,3 +1,4 @@
+using ContactPro.Crosscutting.Constants;
 using ContactPro.Crosscutting.Exceptions;
 using ContactPro.Domain.Entities;
 using ContactPro.Domain.Repositories.Interfaces;
@@ -142,6 +143,7 @@ namespace ContactPro.Controllers
         }
 
         [HttpPut("{id}/email")]
+        [Authorize(Roles=RolesConstants.ADMIN + "," + RolesConstants.USER)]
         public async Task<IActionResult> SendEmailContact([FromBody] EmailData emailData)
         {
             _log.LogDebug($"REST request to post Email Category : {emailData.Id}");

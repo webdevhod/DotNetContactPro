@@ -203,7 +203,6 @@ namespace ContactPro.Controllers
             _log.LogDebug($"Created Data for User: {user}");
         }
 
-        // GET: /<controller>/
         [AllowAnonymous]
         public async Task<ActionResult<User>> Demo()
         {
