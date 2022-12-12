@@ -76,6 +76,12 @@ nav {
   .err2 {
     left: 68%;
   }
+
+  .dropdown-menu-end {
+    &.show {
+      right: 8px;
+    }
+  }
 }
 
 // Large devices (desktops, 992px and up)
