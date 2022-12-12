@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -31,6 +32,7 @@ namespace ContactPro.Controllers
         private UtilityService _utilityService;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IContactRepository _contactRepository;
+        private readonly IHostEnvironment _environment;
         IList<Address> _addressList;
         IList<Person> _personList;
         IList<string> _dobList;
@@ -45,7 +47,8 @@ namespace ContactPro.Controllers
             ITokenProvider tokenProvider,
             UtilityService utilityService,
             ICategoryRepository categoryRepository,
-            IContactRepository contactRepository
+            IContactRepository contactRepository,
+            IHostEnvironment environment
         )
         {
             _log = log;
@@ -56,6 +59,7 @@ namespace ContactPro.Controllers
             _utilityService = utilityService;
             _categoryRepository = categoryRepository;
             _contactRepository = contactRepository;
+            _environment = environment;
 
             _addressList = new List<Address>(){
                 new Address("103 Meridith Dr", "Aberdeen", States.NC, "28315", "(910) 944-9646"),
@@ -70,17 +74,18 @@ namespace ContactPro.Controllers
                 new Address("260 Camel Bend Ct", "Schaumburg", States.IL, "60194", "(847) 798-9253")
             };
 
+            string folderPath = (_environment.IsProduction() ? "out/" : "") + "ClientApp/src/content/img/";
             _personList = new List<Person>(){
-                new Person("Claudia", "Black", "ClientApp/src/content/img/ClaudiaBlack.png"),
-                new Person("Courtenay", "Taylor", "ClientApp/src/content/img/CourtenayTaylor.png"),
-                new Person("Frank", "Langella", "ClientApp/src/content/img/FrankLangella.png"),
-                new Person("Gina", "Torres", "ClientApp/src/content/img/GinaTorres.png"),
-                new Person("Lance", "Reddick", "ClientApp/src/content/img/LanceReddick.png"),
-                new Person("Moira", "Quirk", "ClientApp/src/content/img/MoiraQuirk.png"),
-                new Person("Nathan", "Fillion", "ClientApp/src/content/img/NathanFillion.png"),
-                new Person("Neil", "Kaplan", "ClientApp/src/content/img/NeilKaplan.png"),
-                new Person("Nolan", "North", "ClientApp/src/content/img/NolanNorth.png"),
-                new Person("Page", "Leong", "ClientApp/src/content/img/PageLeong.png")
+                new Person("Claudia", "Black", folderPath + "ClaudiaBlack.png"),
+                new Person("Courtenay", "Taylor", folderPath + "CourtenayTaylor.png"),
+                new Person("Frank", "Langella", folderPath + "FrankLangella.png"),
+                new Person("Gina", "Torres", folderPath + "GinaTorres.png"),
+                new Person("Lance", "Reddick", folderPath + "LanceReddick.png"),
+                new Person("Moira", "Quirk", folderPath + "MoiraQuirk.png"),
+                new Person("Nathan", "Fillion", folderPath + "NathanFillion.png"),
+                new Person("Neil", "Kaplan", folderPath + "NeilKaplan.png"),
+                new Person("Nolan", "North", folderPath + "NolanNorth.png"),
+                new Person("Page", "Leong", folderPath + "PageLeong.png")
             };
 
             _dobList = new List<string>() {
