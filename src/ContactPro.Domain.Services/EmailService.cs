@@ -22,10 +22,10 @@ public class EmailService
         _utilityService = utilityService;
     }
 
-    public async Task SendEmailAsync(string senderEmail, string contactEmail, string subject, string htmlMessage)
+    public async Task SendEmailAsync(string contactEmail, string subject, string htmlMessage)
     {
         var mimeMessage = new MimeMessage();
-        mimeMessage.Sender = MailboxAddress.Parse(senderEmail);
+        mimeMessage.Sender = MailboxAddress.Parse(_mailSettings.Email ?? Environment.GetEnvironmentVariable("Email"));
         mimeMessage.To.Add(MailboxAddress.Parse(contactEmail));
         mimeMessage.Subject = subject;
 
