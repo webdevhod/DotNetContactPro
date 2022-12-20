@@ -18,9 +18,11 @@ export const RegisterPage = () => {
     []
   );
 
-  const handleValidSubmit = ({ username, email, firstPassword }) => {
+  const handleValidSubmit = ({ firstName, lastName, username, email, firstPassword }) => {
     dispatch(
       handleRegister({
+        firstName,
+        lastName,
         login: username,
         email,
         password: firstPassword,
@@ -53,6 +55,52 @@ export const RegisterPage = () => {
       <Row className="justify-content-center">
         <Col md="8">
           <ValidatedForm id="register-form" onSubmit={handleValidSubmit}>
+          <ValidatedField
+              name="firstName"
+              label="First Name"
+              placeholder="Your first name"
+              type="text"
+              validate={{
+                required: {
+                  value: true,
+                  message: "Your first name is required.",
+                },
+                minLength: {
+                  value: 1,
+                  message:
+                    "Your first name is required to be at least 1 character.",
+                },
+                maxLength: {
+                  value: 50,
+                  message:
+                    "Your first name cannot be longer than 50 characters.",
+                }
+              }}
+              data-cy="firstName"
+            />
+          <ValidatedField
+              name="lastName"
+              label="Last Name"
+              placeholder="Your last name"
+              type="text"
+              validate={{
+                required: {
+                  value: true,
+                  message: "Your last name is required.",
+                },
+                minLength: {
+                  value: 1,
+                  message:
+                    "Your last name is required to be at least 1 character.",
+                },
+                maxLength: {
+                  value: 50,
+                  message:
+                    "Your last name cannot be longer than 50 characters.",
+                }
+              }}
+              data-cy="lastName"
+            />
             <ValidatedField
               name="username"
               label="Username"

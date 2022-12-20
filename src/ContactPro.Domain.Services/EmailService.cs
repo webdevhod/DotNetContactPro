@@ -22,19 +22,41 @@ public class EmailService
         _utilityService = utilityService;
     }
 
-    public async Task SendEmailAsync(ICollection<Contact> contacts, string subject, string htmlMessage)
+    public async Task SendEmailAsync(string senderEmail, string contactEmail, string subject, string htmlMessage)
     {
         var mimeMessage = new MimeMessage();
-        foreach(Contact contact in contacts) {
-            mimeMessage.To.Add(MailboxAddress.Parse(contact.Email));
-        }
-        mimeMessage.Sender = MailboxAddress.Parse(_utilityService.GetCurrentUserEmail());
+        mimeMessage.Sender = MailboxAddress.Parse(senderEmail);
+        mimeMessage.To.Add(MailboxAddress.Parse(contactEmail));
         mimeMessage.Subject = subject;
 
         var body = new BodyBuilder();
         body.HtmlBody = htmlMessage;
         mimeMessage.Body = body.ToMessageBody();
 
+        await SendEmailAsync(mimeMessage);
+    }
+
+    public async Task SendEmailAsync(ICollection<Contact> contacts, string subject, string htmlMessage)
+    {
+        var mimeMessage = new MimeMessage();
+
+        mimeMessage.Sender = MailboxAddress.Parse(_utilityService.GetCurrentUserEmail());
+
+        foreach(Contact contact in contacts) {
+            mimeMessage.To.Add(MailboxAddress.Parse(contact.Email));
+        }
+
+        mimeMessage.Subject = subject;
+
+        var body = new BodyBuilder();
+        body.HtmlBody = htmlMessage;
+        mimeMessage.Body = body.ToMessageBody();
+
+        await SendEmailAsync(mimeMessage);
+    }
+
+    private async Task SendEmailAsync(MimeMessage mimeMessage)
+    {
         using var smtp = new SmtpClient();
 
         try 
@@ -53,6 +75,5 @@ public class EmailService
         {
             throw;
         }
-
     }
 }

@@ -93,7 +93,7 @@ describe("Creating account tests", () => {
         },
       ];
       await store.dispatch(
-        handleRegister({ login: "", email: "", password: "" })
+        handleRegister({ firstName: "", lastName: "", login: "", email: "", password: "" })
       );
       expect(store.getActions()[0]).toMatchObject(expectedActions[0]);
       expect(store.getActions()[1]).toMatchObject(expectedActions[1]);

@@ -46,7 +46,8 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> RegisterAccount([FromBody] ManagedUserDto managedUserDto)
     {
         if (!CheckPasswordLength(managedUserDto.Password)) throw new InvalidPasswordException();
-        var user = await _userService.RegisterUser(_userMapper.Map<User>(managedUserDto), managedUserDto.Password);
+        User user = await _userService.RegisterUser(_userMapper.Map<User>(managedUserDto), managedUserDto.Password);
+        await _userManager.AddToRolesAsync(user,  new[] { RolesConstants.USER });
         await _mailService.SendActivationEmail(user);
         return CreatedAtAction(nameof(GetAccount), user);
     }

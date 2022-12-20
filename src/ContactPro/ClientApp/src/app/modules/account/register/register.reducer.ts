@@ -18,6 +18,8 @@ export type RegisterState = Readonly<typeof initialState>;
 export const handleRegister = createAsyncThunk(
   "register/create_account",
   async (data: {
+    firstName: string;
+    lastName: string;
     login: string;
     email: string;
     password: string;

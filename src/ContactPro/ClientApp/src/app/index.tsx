@@ -26,9 +26,7 @@ const render = (Component) =>
   ReactDOM.render(
     <ErrorBoundary>
       <Provider store={store}>
-        <div>
-          <Component />
-        </div>
+        <Component />
       </Provider>
     </ErrorBoundary>,
     rootEl

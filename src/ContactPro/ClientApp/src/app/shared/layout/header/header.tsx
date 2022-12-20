@@ -20,7 +20,6 @@ const Header = (props: IHeaderProps) => {
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
-  // const navigate = useNavigate();
 
   const closeMenu = () => {
     setMenuOpen(false);
